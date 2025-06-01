@@ -1,0 +1,861 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fracturación Hidráulica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap');
+
+  :root {
+    --primary-color: #1a1a1a;
+    --secondary-color: #4a4a4a;
+    --accent-color: #e63946;
+    --text-color: #f5f5f5;
+    --bg-color: #1F2937;
+    --industrial-gray: #2C3E50;
+    --warning-orange: #FFA500;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    overflow-x: hidden;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--bg-color) 0%, var(--industrial-gray) 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.9));
+    opacity: 0.8;
+  }
+
+  .site-logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 150px;
+    height: auto;
+    z-index: 10;
+  }
+
+  @media (max-width: 768px) {
+    .site-logo {
+      width: 100px;
+      top: 10px;
+      left: 10px;
+    }
+  }
+
+  h1 {
+    font-size: 5em;
+    font-weight: 800;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    letter-spacing: 2px;
+    animation: titleFloat 3s ease-in-out infinite;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .scientific-name {
+    font-size: 1.5em;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: -20px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-style: italic;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    animation: titleFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes titleFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-12px) rotate(1deg); }
+  }
+
+  .scene-container {
+    background: linear-gradient(135deg, #1a2a3a 0%, #2C3E50 100%);
+    position: relative;
+    width: 100%;
+    height: 400px;
+    margin: 40px auto;
+    perspective: 1000px;
+    overflow: hidden;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .landscape {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mountains {
+    position: absolute;
+    bottom: 60px;
+    width: 100%;
+    height: 200px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><path fill="%232C3E50" d="M0,200 L200,80 L400,150 L600,50 L800,120 L1000,200 Z"/></svg>') repeat-x;
+    background-size: 1000px 200px;
+    opacity: 0.6;
+  }
+
+  .grass {
+    position: absolute;
+    bottom: 0;
+    left: 0; 
+    width: 100%;  
+    height: 80px;
+    background: linear-gradient(to bottom, #34495E, #2C3E50);
+  }
+
+  .oso-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 300px;
+    animation: none;
+  }
+
+  .oso {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    animation: none;
+    cursor: default;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  .oso img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(4px 8px 12px rgba(0,0,0,0.4)) 
+            drop-shadow(0 0 20px rgba(255,165,0,0.2));
+    pointer-events: none;
+    user-select: none;
+    transition: transform 0.3s ease;
+  }
+
+  @keyframes walkingBear {
+    0%, 100% { transform: none; }
+  }
+
+  @keyframes bearBob {
+    0%, 100% { transform: none; }
+  }
+
+  .button-container {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+    margin: 40px auto;
+    flex-wrap: wrap;
+    padding: 0 20px;
+  }
+
+  .conoce-mas, .calendario-btn, .video-btn {
+    background: linear-gradient(135deg, var(--accent-color), #ff6b6b);
+    color: white;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transform: translateY(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .conoce-mas:hover, .calendario-btn:hover, .video-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    background: linear-gradient(135deg, #ff6b6b, var(--accent-color));
+  }
+
+  .conoce-mas:active, .calendario-btn:active, .video-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+
+  .info-section {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 40px 20px;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(50px);
+    visibility: hidden;
+    transition: all 0.8s ease-out;
+    position: relative;  
+  }
+
+  .cerrar-info {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--accent-color);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  .cerrar-info:hover {
+    background-color: #ff6b6b;
+    transform: scale(1.1);
+  }
+
+  .info-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 30px;
+    padding: 20px;
+  }
+
+  .info-box {
+    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 35px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .info-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  }
+
+  .calendar-box {
+    display: block;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.5s ease-out;
+    order: -1;
+    grid-column: 1 / -1;
+    margin-top: 20px;
+    padding: 30px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.08));
+    border-radius: 20px;
+  }
+
+  .calendar-box h2 {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--industrial-gray);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  .calendar-box.visible {
+    opacity: 1;
+    transform: translateY(0);
+    display: block;
+  }
+
+  .info-box.calendar-box {
+    order: -1;
+    grid-column: 1 / -1;
+    margin-top: 20px;
+  }
+
+  .info-box.calendar-box.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .pdf-calendar {
+    background: rgba(255,255,255,0.08);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    margin-top: 0;
+  }
+
+  .pdf-viewer {
+    width: 100%;
+    height: 600px;
+    border-radius: 15px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+  }
+
+  .pdf-viewer:hover {
+    transform: translateY(-5px);
+  }
+
+  .download-btn {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: #fff;
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    margin: 0 0 30px;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+
+  .download-btn:hover {
+    background-color: #ff6b6b;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  .video-box {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 20px;
+    padding: 30px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .video-box h2 {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--industrial-gray);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  .video-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+  }
+
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 3em;
+    }
+
+    .info-section {
+      padding: 40px 15px;
+    }
+    
+    .info-grid {
+      gap: 20px;
+    }
+    
+    .info-box {
+      padding: 25px;
+    }
+    
+    .info-box h2 {
+      font-size: 1.4em;
+    }
+
+    .scene-container {
+      height: 300px;
+    }
+
+    .calendar-box {
+      padding: 20px;
+    }
+    
+    .calendar-box h2 {
+      font-size: 2em;
+    }
+    
+    .pdf-viewer {
+      height: 500px;
+    }
+    
+    .download-btn {
+      padding: 12px 25px;
+      font-size: 1em;
+    }
+    
+    .video-container {
+      max-width: 100%;
+    }
+    
+    .conoce-mas, .calendario-btn, .video-btn {
+      padding: 12px 25px;
+      font-size: 0.9em;
+    }
+    
+    .button-container {
+      gap: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .oso-container {
+      width: 300px;
+      height: 225px;
+    }
+  }
+
+  header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .forest-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    animation: floatParticle 15s infinite linear;
+  }
+
+  @keyframes floatParticle {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(-100vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  .citation {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    margin: 20px 0;
+    color: rgba(255,255,255,0.8);
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .citation.visible {
+    display: block;
+  }
+
+  .citation a {
+    color: var(--industrial-gray);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .citation a:hover {
+    color: #fff;
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+</head>
+<body>
+  <header>
+    <img src="/a/7e081255-f4dc-4293-bcc8-a9ce88d964ec" 
+         alt="Humova logo" 
+         class="site-logo"
+         width="150" 
+         height="auto">
+    <div class="header-overlay"></div>
+    <div class="container">
+      <h1>Fracturación Hidráulica</h1>
+      <div class="scientific-name">Fracking</div>
+      <div class="scene-container">
+        <div class="landscape">
+          <div class="mountains"></div>
+          <div class="grass"></div>
+        </div>
+        <div class="oso-container">
+          <div class="oso">
+            <img src="fracking_rig.png" 
+                 alt="Drilling rig illustration"
+                 width="400" 
+                 height="300"
+                 style="object-fit: contain;">
+          </div>
+        </div>
+      </div>
+      <div class="button-container">
+        <button class="conoce-mas">Saber más</button>
+        <button class="calendario-btn">Estadísticas</button>
+        <button class="video-btn">Video</button>
+      </div>
+    </div>
+    <div class="forest-particles">
+    </div>
+  </header>
+
+  <div class="container info-section">
+    <button class="cerrar-info">×</button>
+    <div class="info-grid">
+      <div class="info-box">
+        <h2>¿Qué es la Fracturación Hidráulica?</h2>
+        <p>La fracturación hidráulica es una técnica utilizada para extraer gas natural y petróleo del subsuelo. El proceso implica:</p>
+        <ul>
+          <li>Perforación vertical y horizontal</li>
+          <li>Inyección de agua a alta presión</li>
+          <li>Uso de productos químicos y arena</li>
+          <li>Creación de fracturas en la roca</li>
+          <li>Extracción de hidrocarburos</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Proceso y Técnica</h2>
+        <ul>
+          <li>Profundidad: 1-3 km bajo tierra</li>
+          <li>Presión: 345-690 bar</li>
+          <li>Volumen de agua: 8-30 millones de litros</li>
+          <li>Duración: 3-5 días por pozo</li>
+          <li>Vida útil: 20-30 años</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Impacto Ambiental</h2>
+        <ul>
+          <li>Consumo intensivo de agua</li>
+          <li>Riesgo de contaminación de acuíferos</li>
+          <li>Emisiones de metano</li>
+          <li>Posible actividad sísmica</li>
+          <li>Alteración del paisaje</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Beneficios Económicos</h2>
+        <ul>
+          <li>Creación de empleos</li>
+          <li>Independencia energética</li>
+          <li>Reducción de costos energéticos</li>
+          <li>Desarrollo económico local</li>
+          <li>Aumento de inversiones</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Controversias</h2>
+        <ul>
+          <li>Debate sobre impacto ambiental</li>
+          <li>Preocupaciones sobre salud pública</li>
+          <li>Regulaciones variables</li>
+          <li>Oposición social</li>
+          <li>Conflictos de uso de tierra</li>
+        </ul>
+      </div>
+
+      <div class="info-box">
+        <h2>Regulación y Seguridad</h2>
+        <ul>
+          <li>Monitoreo sísmico continuo</li>
+          <li>Control de calidad del agua</li>
+          <li>Protección de acuíferos</li>
+          <li>Gestión de residuos</li>
+          <li>Planes de emergencia</li>
+          <li>Certificaciones requeridas</li>
+        </ul>
+      </div>
+
+      <div class="citation">
+        Fuentes: 
+        <a href="https://www.epa.gov/hydraulicfracturing" target="_blank">EPA - Hydraulic Fracturing</a> | 
+        <a href="https://www.usgs.gov/faqs/what-hydraulic-fracturing" target="_blank">USGS</a>
+      </div>
+
+      <div class="info-box calendar-box">
+        <h2>Estadísticas Globales</h2>
+        <div class="pdf-calendar">
+          <a href="https://www.eia.gov/analysis/studies/worldshalegas/" class="download-btn" target="_blank">
+            Ver Estadísticas Completas
+          </a>
+          <iframe class="pdf-viewer" 
+                  src="https://www.eia.gov/analysis/studies/worldshalegas/"
+                  allow="autoplay"></iframe>
+        </div>
+      </div>
+
+      <div class="info-box video-box">
+        <h2>¿Cómo Funciona el Fracking?</h2>
+        <div class="video-container">
+          <iframe 
+            src="https://www.youtube.com/embed/VY34PQUiwOQ"
+            title="Video sobre Fracturación Hidráulica"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+      const conoceMasBtn = document.querySelector('.conoce-mas');
+      const calendarioBtn = document.querySelector('.calendario-btn');
+      const videoBtn = document.querySelector('.video-btn');
+      const infoSection = document.querySelector('.info-section');
+      const infoBoxes = document.querySelectorAll('.info-box');
+      const osoContainer = document.querySelector('.oso-container');
+      const oso = document.querySelector('.oso');
+      const cerrarInfoBtn = document.querySelector('.cerrar-info');
+
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let originalX = 0;
+      let originalY = 0;
+      let currentTransform = { x: 0, y: 0 };
+      let velocityX = 0;
+      let velocityY = 0;
+      let lastX = 0;
+      let lastY = 0;
+      let lastTime = 0;
+
+      infoSection.style.visibility = 'hidden';
+      
+      conoceMasBtn.addEventListener('click', () => {
+        infoSection.style.visibility = 'visible';
+        setTimeout(() => {
+          infoSection.classList.add('visible');
+        }, 100);
+        
+        infoBoxes.forEach((box, index) => {
+          if (!box.classList.contains('calendar-box') && !box.classList.contains('video-box')) {
+            box.style.display = 'block';
+            setTimeout(() => {
+              box.style.opacity = '1';
+              box.style.transform = 'translateY(0)';
+            }, 300 + (index * 150));
+          } else {
+            box.style.opacity = '0';
+            box.style.transform = 'translateY(50px)';
+            setTimeout(() => {
+              box.style.display = 'none';
+            }, 300);
+          }
+        });
+
+        document.querySelector('.citation').style.display = 'block';
+        setTimeout(() => {
+          document.querySelector('.citation').style.opacity = '1';
+        }, 300);
+        
+        conoceMasBtn.style.opacity = '0';
+        setTimeout(() => {
+          conoceMasBtn.style.display = 'none';
+        }, 300);
+        
+        const targetY = infoSection.getBoundingClientRect().top + window.pageYOffset - 50;
+        window.scrollTo({
+          top: targetY,
+          behavior: 'smooth'
+        });
+      });
+
+      calendarioBtn.addEventListener('click', () => {
+        infoSection.style.visibility = 'visible';
+        setTimeout(() => {
+          infoSection.classList.add('visible');
+        }, 100);
+        
+        infoBoxes.forEach(box => {
+          if (box.classList.contains('calendar-box')) {
+            box.style.display = 'block';
+            setTimeout(() => {
+              box.style.opacity = '1';
+              box.style.transform = 'translateY(0)';
+            }, 300);
+          } else {
+            box.style.opacity = '0';
+            box.style.transform = 'translateY(50px)';
+            setTimeout(() => {
+              box.style.display = 'none';
+            }, 300);
+          }
+        });
+        
+        document.querySelector('.citation').style.opacity = '0';
+        setTimeout(() => {
+          document.querySelector('.citation').style.display = 'none';
+        }, 300);
+
+        calendarioBtn.style.opacity = '0';
+        setTimeout(() => {
+          calendarioBtn.style.display = 'none';
+        }, 300);
+        
+        window.scrollTo({
+          top: infoSection.offsetTop,
+          behavior: 'smooth'
+        });
+      });
+
+      videoBtn.addEventListener('click', () => {
+        infoSection.style.visibility = 'visible';
+        setTimeout(() => {
+          infoSection.classList.add('visible');
+        }, 100);
+        
+        infoBoxes.forEach(box => {
+          if (box.classList.contains('video-box')) {
+            box.style.display = 'block';
+            setTimeout(() => {
+              box.style.opacity = '1';
+              box.style.transform = 'translateY(0)';
+            }, 300);
+          } else {
+            box.style.opacity = '0';
+            box.style.transform = 'translateY(50px)';
+            setTimeout(() => {
+              box.style.display = 'none';
+            }, 300);
+          }
+        });
+        
+        document.querySelector('.citation').style.opacity = '0';
+        setTimeout(() => {
+          document.querySelector('.citation').style.display = 'none';
+        }, 300);
+
+        videoBtn.style.opacity = '0';
+        calendarioBtn.style.opacity = '0';
+        conoceMasBtn.style.opacity = '0';
+        setTimeout(() => {
+          videoBtn.style.display = 'none';
+          calendarioBtn.style.display = 'none';
+          conoceMasBtn.style.display = 'none';
+        }, 300);
+        
+        window.scrollTo({
+          top: infoSection.offsetTop,
+          behavior: 'smooth'
+        });
+      });
+
+      cerrarInfoBtn.addEventListener('click', () => {
+        infoSection.classList.remove('visible');
+        
+        infoBoxes.forEach(box => {
+          box.style.opacity = '0';
+          box.style.transform = 'translateY(50px)';
+        });
+        
+        setTimeout(() => {
+          infoSection.style.visibility = 'hidden';
+          infoBoxes.forEach(box => {
+            box.style.display = 'none';
+          });
+          
+          conoceMasBtn.style.display = 'block';
+          calendarioBtn.style.display = 'block';
+          videoBtn.style.display = 'block';
+          setTimeout(() => {
+            conoceMasBtn.style.opacity = '1';
+            calendarioBtn.style.opacity = '1';
+            videoBtn.style.opacity = '1';
+          }, 100);
+        }, 800);
+
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+
+      function createParticles() {
+        const container = document.querySelector('.forest-particles');
+        for (let i = 0; i < 50; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDelay = Math.random() * 15 + 's';
+          particle.style.opacity = Math.random() * 0.5;
+          container.appendChild(particle);
+        }
+      }
+      createParticles();
+    });
+  </script>
+</body></html>
